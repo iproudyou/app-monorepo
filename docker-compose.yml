@@ -1,0 +1,44 @@
+version: '3'
+services:
+  app-ui:
+    container_name: app-ui
+    build: ./app-ui
+    stdin_open: true
+    env_file: ./app-ui/.env
+    ports:
+      - "3000:3000"
+    networks: 
+      - mern-app
+    depends_on:
+      - app-api
+
+  app-api:
+    container_name: app-api
+    build: ./app-api
+    env_file: ./app-api/.env.local
+    ports:
+      - "8081:8081"
+    networks: 
+      - mern-app
+    depends_on:
+      - app-mongo
+
+  app-mongo:
+    image: mongo:3.6.22-xenial
+    container_name: app-mongo
+    restart: always
+    volumes: 
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=admin
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
+networks: 
+  mern-app:
+    driver: bridge
+volumes:
+  mongo-data:
+    driver: local
